@@ -34,6 +34,25 @@ AIGC:
 
 - **English documentation**: [English Documentation](#english-documentation)
 
+### 界面预览
+
+<p align="center">
+  <img src="docs/screenshots/01-app-icon.jpg" width="110" alt="App 图标">
+</p>
+
+<table align="center">
+  <tr>
+    <td align="center"><img src="docs/screenshots/02-wheel-menu.jpg" width="320" alt="圆盘主菜单"><br><sub>圆盘主菜单</sub></td>
+    <td align="center"><img src="docs/screenshots/03-scientific-exchange.jpg" width="320" alt="科学计算与汇率换算"><br><sub>科学计算与汇率换算</sub></td>
+    <td align="center"><img src="docs/screenshots/04-pomodoro-base.jpg" width="320" alt="番茄钟与进制转换"><br><sub>番茄钟与进制转换</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/05-polar-fit.jpg" width="320" alt="极坐标绘图与数据拟合"><br><sub>极坐标绘图与数据拟合</sub></td>
+    <td align="center"><img src="docs/screenshots/06-3d-spiral.jpg" width="320" alt="三维空间螺旋曲线"><br><sub>三维空间螺旋曲线</sub></td>
+    <td align="center"><img src="docs/screenshots/01-app-icon.jpg" width="320" alt="App 图标"><br><sub>App 图标</sub></td>
+  </tr>
+</table>
+
 ### 版本说明
 
 | 版本 | 圆盘项数 | 主要差异 |
@@ -383,6 +402,25 @@ Calculator is a desktop calculator app for macOS built with SwiftUI + AppKit. It
 > This project is originally designed, developed and maintained by **f8r4ksv7v4-hub**. The UI and all features are original implementations. This repository only ships documentation and the official installers — no source code is provided.
 
 - **中文文档**: [中文文档](#中文文档)
+
+### Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/01-app-icon.jpg" width="110" alt="App icon">
+</p>
+
+<table align="center">
+  <tr>
+    <td align="center"><img src="docs/screenshots/02-wheel-menu.jpg" width="320" alt="Wheel menu"><br><sub>Wheel menu</sub></td>
+    <td align="center"><img src="docs/screenshots/03-scientific-exchange.jpg" width="320" alt="Scientific calculator and currency exchange"><br><sub>Scientific calculator &amp; currency exchange</sub></td>
+    <td align="center"><img src="docs/screenshots/04-pomodoro-base.jpg" width="320" alt="Pomodoro timer and base conversion"><br><sub>Pomodoro timer &amp; base conversion</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/05-polar-fit.jpg" width="320" alt="Polar plot with data fitting"><br><sub>Polar plot with data fitting</sub></td>
+    <td align="center"><img src="docs/screenshots/06-3d-spiral.jpg" width="320" alt="3D space spiral curve"><br><sub>3D space spiral curve</sub></td>
+    <td align="center"><img src="docs/screenshots/01-app-icon.jpg" width="320" alt="App icon"><br><sub>App icon</sub></td>
+  </tr>
+</table>
 
 ### Version History
 
