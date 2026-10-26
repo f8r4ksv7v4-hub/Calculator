@@ -57,11 +57,12 @@ AIGC:
 
 | 版本 | 圆盘项数 | 主要差异 |
 | --- | --- | --- |
-| **2.3**（当前开发版本） | 12 | 在 2.0 之上新增：绘图的**多图线**（同一张图内多条曲线，逐线数据 / 颜色 / 拟合）、**导出 CSV**（多线分列并汇总逐线拟合结果）、三维**导出 OBJ**，以及各二级窗口右上角的 **i 使用说明** 面板 |
+| **3.2.6**（当前版本） | 12 | 在 2.3 之上：科学模式改为**整式输入**（维护表达式缓冲区，按 `=` 才由递归下降解析器一次性求值，支持括号 / 运算优先级 / 隐式乘法 / 函数，并新增 π、e、`^`、`%`、±）；绘图数据表支持**多表管理与图线绑定**，删除 / 清空 / 固化 / 解除等危险操作统一二次确认；数据表**填一行自动补一行**；图线重建改为停止输入后再计算；预览区新增「清空图线」兜底入口 |
+| 2.3 | 12 | 在 2.0 之上新增：绘图的**多图线**（同一张图内多条曲线，逐线数据 / 颜色 / 拟合）、**导出 CSV**（多线分列并汇总逐线拟合结果）、三维**导出 OBJ**，以及各二级窗口右上角的 **i 使用说明** 面板 |
 | 2.0 | 12 | 在 1.0 全部功能之上新增「番茄钟」：独立窗口、左下角剩余时间胶囊、到时提醒 |
 | 1.0 | 11 | 普通 / 科学 / 汇率 / 重量 / 温度 / 面积 / 速度 / 时间 / 存储 / 进制 / 绘图 |
 
-> 说明：当前 [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面提供的官方安装包为 **2.0** 与 **1.0**；2.3 的安装包随后续 Release 提供。应用内的「检查更新」只会下载 Release 中名称含 `macOS` 的 zip 资产。
+> 说明：当前 [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面提供的官方安装包为 **3.2.6**、**2.0** 与 **1.0**。应用内的「检查更新」只会下载 Release 中名称含 `macOS` 的 zip 资产。
 
 ### 功能特性
 
@@ -94,14 +95,15 @@ AIGC:
 
 | 版本 | 安装包 | 大小 | 下载直链 |
 | --- | --- | --- | --- |
-| **2.0**（推荐） | `Calculator-2.0-macOS.zip` | 约 2.0 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v2.0/Calculator-2.0-macOS.zip) |
+| **3.2.6**（推荐） | `Calculator-3.2.6-macOS.zip` | 约 3.6 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.2.6/Calculator-3.2.6-macOS.zip) |
+| 2.0 | `Calculator-2.0-macOS.zip` | 约 2.0 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v2.0/Calculator-2.0-macOS.zip) |
 | 1.0 | `Calculator-1.0-macOS.zip` | 约 1.9 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v1.0/Calculator-1.0-macOS.zip) |
 
 全部版本与更新日志见 [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面。
 
 ### 安装与首次启动
 
-1. 打开本仓库的 [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面，下载对应版本的安装包（`Calculator-2.0-macOS.zip` 或 `Calculator-1.0-macOS.zip`）
+1. 打开本仓库的 [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面，下载对应版本的安装包（`Calculator-3.2.6-macOS.zip`、`Calculator-2.0-macOS.zip` 或 `Calculator-1.0-macOS.zip`）
 2. 双击解压得到「计算器.app」，拖入「应用程序」文件夹
 3. **首次启动会被 Gatekeeper 拦截**：安装包为开发者签名、未经 Apple 公证，系统会提示「无法验证开发者」或「Apple 无法检查其是否包含恶意软件」。按以下任一方式放行即可：
    - 在「访达」中 **按住 Control 点击（或右键）**「计算器.app」→ 选择「打开」→ 在弹窗中再次点击「打开」
@@ -426,11 +428,12 @@ Calculator is a desktop calculator app for macOS built with SwiftUI + AppKit. It
 
 | Version | Wheel items | Key differences |
 | --- | --- | --- |
-| **2.3** (current development version) | 12 | Adds over 2.0: **multiple lines** in a single plot (per-line data / colour / fit), **CSV export** (columns split per line plus a per-line fit summary), **OBJ export** for 3D, and the **i Information** panel in the top-right corner of every secondary window |
+| **3.2.6** (current version) | 12 | Over 2.3: the Scientific mode now takes a **whole expression** (buffered, evaluated once by a recursive-descent parser on `=`; brackets, precedence, implicit multiplication, functions, plus π, e, `^`, `%`, ±); the plot data area gains **multiple tables with line binding**, and destructive actions (delete / clear / pin / unpin) share one confirmation dialog; tables **append a fresh row as you fill** the last one; line rebuilding is deferred until typing stops; a "Clear lines" fallback sits next to the plot preview |
+| 2.3 | 12 | Adds over 2.0: **multiple lines** in a single plot (per-line data / colour / fit), **CSV export** (columns split per line plus a per-line fit summary), **OBJ export** for 3D, and the **i Information** panel in the top-right corner of every secondary window |
 | 2.0 | 12 | Adds the "Pomodoro" mode on top of everything in 1.0: its own window, a remaining-time pill in the bottom-left corner, and end-of-phase alerts |
 | 1.0 | 11 | Basic / Scientific / Exchange / Weight / Temperature / Area / Speed / Time / Data / Base / Plot |
 
-> Note: the official installers currently available on the [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page are **2.0** and **1.0**; the 2.3 installer will follow in a later Release. The in-app "Check for Updates" only downloads zip assets whose name contains `macOS`.
+> Note: the official installers currently available on the [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page are **3.2.6**, **2.0** and **1.0**. The in-app "Check for Updates" only downloads zip assets whose name contains `macOS`.
 
 ### Features
 
@@ -463,14 +466,15 @@ Calculator is a desktop calculator app for macOS built with SwiftUI + AppKit. It
 
 | Version | Installer | Size | Direct link |
 | --- | --- | --- | --- |
-| **2.0** (recommended) | `Calculator-2.0-macOS.zip` | ~2.0 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v2.0/Calculator-2.0-macOS.zip) |
+| **3.2.6** (recommended) | `Calculator-3.2.6-macOS.zip` | ~3.6 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.2.6/Calculator-3.2.6-macOS.zip) |
+| 2.0 | `Calculator-2.0-macOS.zip` | ~2.0 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v2.0/Calculator-2.0-macOS.zip) |
 | 1.0 | `Calculator-1.0-macOS.zip` | ~1.9 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v1.0/Calculator-1.0-macOS.zip) |
 
 All versions and release notes live on the [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page.
 
 ### Installation & First Launch
 
-1. Open this repository's [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page and download the installer you need (`Calculator-2.0-macOS.zip` or `Calculator-1.0-macOS.zip`)
+1. Open this repository's [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page and download the installer you need (`Calculator-3.2.6-macOS.zip`, `Calculator-2.0-macOS.zip` or `Calculator-1.0-macOS.zip`)
 2. Double-click to unzip "计算器.app" and drag it into your Applications folder
 3. **Gatekeeper will block the first launch**: the installer is developer-signed but not notarised by Apple, so macOS reports "cannot verify the developer" or "Apple cannot check it for malicious software". Let it through using any of these:
    - In Finder, **Control-click (or right-click)** "计算器.app" → choose "Open" → click "Open" again in the dialog
