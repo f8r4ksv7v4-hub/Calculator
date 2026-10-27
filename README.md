@@ -53,11 +53,52 @@ AIGC:
   </tr>
 </table>
 
+### 计算式绘图（3.x 主打功能）
+
+2.x 的绘图是「录点 → 画线」。3.x 把它升级为一台**实验数据处理工作站**：数据表是唯一数据源，图线是它的视图，公式是两者之间的桥。
+
+**一张表装下整个实验**
+- 全局数据表，可建多张并随时切换（一张表一个实验、一组样品或一次测量）。
+- 行列任意增删，表头自定义且**表头就是公式变量**：`[电压] / [电流]` 直接算出电阻，不用记 A1、B2；中文、空格、下标都能当列名（`[温度 T]`、`[第 1 组]`）。
+- 新建表只给一行空白，填满末行自动追加下一行；导入 CSV / TSV / TXT / Excel 后自动补空白行，边看数据边追录。
+
+**计算列：写一条公式，整列同时算出**
+
+| 写法 | 能做什么 |
+| --- | --- |
+| `[电压] / [电流]` | 逐行四则运算，列与列直接算 |
+| `[时间]^2` | 先构造 t² 列，再做线性拟合 |
+| `ln([浓度])` | 一级反应动力学线性化 |
+| `sqrt([面积] / pi)` | 反推半径（常量 `pi` / `π` / `e` 可直接用） |
+| `mean([读数])` | 整列均值，自动铺到每一行，可直接画均值线 |
+| `([读数] - mean([读数])) / std([读数])` | 一条公式做 z-score 标准化 |
+| `if([温度] > 25, 1, 0)` | 按阈值条件分组打标签 |
+| `pow([r], 3) * 4 / 3 * pi` | 多参数函数与幂运算自由组合 |
+
+- **运算符**：`+ - * / ^`、一元正负、比较 `> < >= <= == !=`
+- **函数**：`abs sqrt cbrt round floor ceil sign exp ln log log10 log2`，三角与反三角 `sin cos tan asin acos atan sec csc cot`，双曲 `sinh cosh tanh`
+- **多参数**：`pow(a,b)`、`mod(a,b)`、`atan2(y,x)`、`if(条件, 真值, 假值)`
+- **整列聚合**：`mean / avg / sum / min / max / count / median / std / stdp / first / last / range`
+- 面板内置**符号速查表**与「插入函数」菜单，不用背语法
+
+**工程化的细节**
+- 计算列可引用另一条计算列，引擎按依赖关系自动拓扑排序求解；互相引用会明确标记「循环引用」。
+- 逐列缓存按内容签名失效，只重算受影响的那一列，几千行也能边改边刷。
+- 公式写错、除数为 0、依赖列出错，原因直接标在对应列旁；除零单元格留空而不是塞 `inf`。
+- 重命名列时公式引用自动同步，不会断链。
+- 三角函数按弧度计算，界面直接提示「角度需先乘 π/180」。
+
+**图线是表的视图**
+- 图线可绑定表的 **x / y / z / 误差**列：改一个单元格，曲线立刻重画；绑定 z 列可直接用于三维绘图。
+- 需要冻结某份数据时点**固化**：当前点集固化为独立图线，之后改表也不影响它；也可解除绑定或删除。
+- 预览区「清空图线」一键清掉所有线（含绑定派生线、已固化线与删表后的残留线）并断开绑定。
+- 导出把公式结果一并带走：CSV（多线分列 + 逐线拟合汇总）、Excel xlsx、三维 OBJ、PNG（屏幕所见即导出所见）。
+
 ### 版本说明
 
 | 版本 | 圆盘项数 | 主要差异 |
 | --- | --- | --- |
-| **3.2.6**（当前版本） | 13 | 相对 2.0 累积三组大改：① 新增**矩阵计算**模式（圆盘第 13 项，矩阵 A / B / 结果三级页：加减乘、数乘、转置、行列式、逆、秩、解 Ax=b，运算式只在结果页）；② **绘图页大幅重构**——拆为「直接绘图 / 计算式绘图」双模式，新增全局**数据表**（多表、行列增删、自定义表头直接作为公式变量）、**计算列**（列引用与整列聚合）、**图线绑定表列并实时联动**（可固化 / 解除 / 删除）、图线管理栏与「清空图线」兜底；③ **按钮布局与逻辑关系重做**：控件按四级视觉层级分规格、危险操作统一红系语义色并收敛到单一二次确认弹窗；另含科学模式**整式输入**（按 `=` 一次性求值，支持括号 / 优先级 / 隐式乘法 / 函数 / π / e / `^` / `%` / ±）、数据表**填一行自动补一行**、图线重建延后到停止输入、**i 使用说明面板**扩写为双语逐按钮说明 |
+| **3.2.6**（当前版本） | 13 | 相对 2.0 累积三组大改：① **计算式绘图（本轮主打）**——绘图页从「录点画线」升级为实验数据处理工作站：全局**数据表**（多表切换、行列增删、自定义表头**直接作为公式变量**、填满末行自动补行、CSV / Excel 导入）、**计算列**（列引用 `[列名]`、`^` 幂与比较、`ln / log / sqrt / if / pow / mod / atan2` 等函数、整列聚合 `mean / sum / std / stdp / median / range` 等，一条公式算出整列，聚合自动铺满每一行）、**图线绑定表列实时联动**（x / y / z / 误差，可固化 / 解除 / 删除），并具备依赖拓扑排序、循环引用检测、逐列缓存、列重命名自动同步公式等工程化内核；② 新增**矩阵计算**模式（圆盘第 13 项，矩阵 A / B / 结果三级页：加减乘、数乘、转置、行列式、逆、秩、解 Ax=b，运算式只在结果页）；③ **按钮布局与逻辑关系重做**：控件按四级视觉层级分规格、危险操作统一红系语义色并收敛到单一二次确认弹窗；另含绘图页双模式拆分与「清空图线」兜底、科学模式**整式输入**（按 `=` 一次性求值，支持括号 / 优先级 / 隐式乘法 / 函数 / π / e / `^` / `%` / ±）、图线重建延后到停止输入、**i 使用说明面板**扩写为双语逐按钮说明 |
 | 2.3 | 12 | 在 2.0 之上新增：绘图的**多图线**（同一张图内多条曲线，逐线数据 / 颜色 / 拟合）、**导出 CSV**（多线分列并汇总逐线拟合结果）、三维**导出 OBJ**，以及各二级窗口右上角的 **i 使用说明** 面板 |
 | 2.0 | 12 | 在 1.0 全部功能之上新增「番茄钟」：独立窗口、左下角剩余时间胶囊、到时提醒 |
 | 1.0 | 11 | 普通 / 科学 / 汇率 / 重量 / 温度 / 面积 / 速度 / 时间 / 存储 / 进制 / 绘图 |
@@ -78,7 +119,12 @@ AIGC:
   - 极坐标图：输入关于角度 t 的半径表达式，设定角度范围与采样数，附带同心圆网格、角度线与角度标签
   - 三维图像：表达式曲面 z = f(x, y) 或三维数据点（曲面网格 / 空间线）；拖动旋转、缩放；拟合平面、外推、切平面、两点测量；x / y / z 轴名称、点坐标标签、均值面、误差棒、范围锁定
   - **多图线（2.3）**：同一张图内可添加多条图线，逐线独立的数据、颜色、显示与拟合配置，图例与逐线拟合结果一并绘制与导出
-  - **计算式绘图（3.x）**：绘图页分为「直接绘图 / 计算式绘图」两种模式。计算式绘图下有一套全局数据表（可建多张、任意增删行列、自定义表头，表头可直接当公式变量）；可新增**计算列**（列引用、多参数函数、整列聚合 mean / sum / std / median 等）；图线可绑定表的 x / y / z / 误差列并随表格实时联动，也可固化；另有绘图历史、特征点面板与「清空图线」兜底
+  - **计算式绘图（3.x，主打）**：绘图页分为「直接绘图 / 计算式绘图」两种模式，后者是一套完整的实验数据处理流程——建表、写公式、画线，三者共用一份数据：
+    - **全局数据表**：可建多张表并切换（一表一实验），任意增删行列，自定义表头**直接当公式变量**（`[电压]`、`[温度 T]` 皆可，支持中文与空格）；新建表只给一行空白，填满末行自动续行；支持 CSV / TSV / TXT / Excel 导入
+    - **计算列**：一条公式算出整列，支持 `+ - * / ^` 与比较运算，`abs sqrt ln log log10 exp round floor ceil` 等数学函数，`sin cos tan asin acos atan` 等三角反三角（弧度），多参数 `pow / mod / atan2 / if(条件, 真值, 假值)`，以及整列聚合 `mean / sum / min / max / count / median / std / stdp / first / last / range`（聚合结果自动铺到每一行，可直接画均值线）
+    - **工程化内核**：计算列可互相引用并自动拓扑排序求解，循环引用明确标记；逐列缓存按内容签名失效，只重算受影响的列；公式错误、除零、依赖出错均在列旁标注原因，除零单元格留空；重命名列自动同步所有公式引用
+    - **图线绑定与联动**：图线可绑定表的 x / y / z / 误差列，改表即改图；支持固化为独立图线、解除绑定、删除；「清空图线」一键清掉绑定派生线与删表残留线
+    - 面板内置公式符号速查表与插入函数菜单，绘图历史可恢复当时的数据表、公式与绑定
   - 曲线数字化（从图片提取数据点）、绘图历史（可恢复数据与设置重新生成）
   - 导出 PNG（屏幕所见即导出所见）、导出 CSV（数据点与拟合结果）、三维导出 OBJ
 - **番茄钟（2.0）**：工作 / 休息时长可自定义（默认 25 / 5 分钟自动循环）；工作结束与休息结束的提醒方式各自独立配置（静音 / 震动 / 响铃 / 响铃 + 震动，响铃与震动强度可调），到时有屏幕边缘光晕呼吸提示；收起后左下角小角常驻显示剩余时间胶囊，可直接开始 / 暂停
@@ -139,6 +185,14 @@ AIGC:
 3. 二维与三维在「数据 / 图表 / 工具」功能区中录入数据（手动添加或导入表格）、设置图表样式与拟合、显示元素与标注
 4. 极坐标图输入半径表达式，并设定角度范围与采样数
 5. 完成后可导出 PNG（二维另有 CSV，三维另有 OBJ）；导出记录进入绘图历史，可恢复数据与设置重新生成
+
+**计算式绘图怎么用（3.x）**
+
+1. 顶部模式切到「计算式绘图」，「数据」页即出现全局数据表
+2. 改好表头（如 `x`、`电压`、`电流`），逐行录入或导入 CSV / Excel，末行填满会自动补下一行
+3. 点「+ 计算列」，起个列名（如 `电阻`），写公式 `[电压] / [电流]`，整列立刻算出；需要标准化就写 `([电压] - mean([电压])) / std([电压])`，需要分组就写 `if([温度] > 25, 1, 0)`
+4. 到「图线绑定」区把 x / y（三维再加 z）指向表列，曲线随表格实时重画；想要一份不再变化的数据就点「固化」
+5. 到「图表」页选拟合类型，工具页设置标注与导出，CSV 会连计算列与逐线拟合结果一起导出
 
 #### 番茄钟（2.0）
 
@@ -426,6 +480,47 @@ Calculator is a desktop calculator app for macOS built with SwiftUI + AppKit. It
   </tr>
 </table>
 
+### Formula Plotting (headline feature of 3.x)
+
+Plotting used to be "type points, draw a line". In 3.x it is a small data-reduction workstation: the table is the single source of truth, lines are its views, formulas connect the two.
+
+**One table per experiment**
+- Multiple global tables, switched at will (one per experiment, sample set or run).
+- Free row / column editing with custom headers that **work directly as formula variables**: `[Voltage] / [Current]` yields resistance, no A1/B2 bookkeeping. Chinese names, spaces and subscripts are all fine (`[Temp T]`, `[Run 1]`).
+- A new table starts with one blank row and appends the next one as soon as the last row is filled; CSV / TSV / TXT / Excel imports get a blank row appended so you can keep typing readings.
+
+**Formula columns: one formula, a whole column of results**
+
+| Expression | What it does |
+| --- | --- |
+| `[Voltage] / [Current]` | Row-wise arithmetic straight across columns |
+| `[Time]^2` | Build a t² column before a linear fit |
+| `ln([Conc])` | Linearise first-order kinetics |
+| `sqrt([Area] / pi)` | Back out a radius (`pi` / `π` / `e` are built in) |
+| `mean([Reading])` | Column mean, broadcast to every row, ready to plot as a mean line |
+| `([Reading] - mean([Reading])) / std([Reading])` | z-score standardisation in a single formula |
+| `if([Temp] > 25, 1, 0)` | Threshold labelling / grouping |
+| `pow([r], 3) * 4 / 3 * pi` | Multi-argument functions and powers combined |
+
+- **Operators**: `+ - * / ^`, unary sign, comparisons `> < >= <= == !=`
+- **Functions**: `abs sqrt cbrt round floor ceil sign exp ln log log10 log2`, trig and inverse trig `sin cos tan asin acos atan sec csc cot`, hyperbolic `sinh cosh tanh`
+- **Multi-argument**: `pow(a,b)`, `mod(a,b)`, `atan2(y,x)`, `if(cond, then, else)`
+- **Column aggregates**: `mean / avg / sum / min / max / count / median / std / stdp / first / last / range`
+- Built-in **symbol cheat sheet** and an "insert function" menu — no syntax to memorise
+
+**Engineering details, not a toy evaluator**
+- A formula column may reference another formula column; the engine orders evaluation by dependency (topological sort) and flags circular references explicitly.
+- Per-column caching invalidated by content signatures recomputes only what changed, even with thousands of rows.
+- Bad syntax, division by zero and failing dependencies are reported next to the offending column; a division-by-zero cell stays blank instead of holding `inf`.
+- Renaming a column rewrites every formula that references it, so nothing breaks.
+- Trigonometry works in radians, and the UI says so ("multiply degrees by π/180 first").
+
+**Lines are views of the table**
+- A line binds to the table's **x / y / z / error** columns: edit one cell and the curve redraws; bind z to drive 3D plots.
+- **Pin** a line to freeze the current point set as an independent line — later table edits no longer disturb it — or unlink / delete it.
+- **Clear all lines** wipes every line (derived, pinned, and leftovers from deleted tables) and drops the bindings.
+- Exports carry the computed columns: CSV (per-line columns plus a fit summary), Excel xlsx, 3D OBJ, and PNG exactly as shown on screen.
+
 ### Version History
 
 | Version | Wheel items | Key differences |
@@ -511,7 +606,14 @@ Launching the app shows the level-1 floating wheel, with the modes arranged cloc
 2. Switch between "2D Image / Polar / 3D Image" at the top
 3. For 2D and 3D, enter data (manually or by importing a table), set chart style and fit, display elements and labels in the "Data / Chart / Tools" ribbon
 4. For polar charts, enter the radius expression and set the angle range and sample count
-5. When done, export PNG (plus CSV for 2D, OBJ for 3D); every export is recorded in the plot history and can be restored and regenerated
+
+**Formula plotting in five steps (3.x)**
+
+1. Switch the top mode to "Formula Plot"; the Data tab now shows the global table
+2. Rename the headers (`x`, `Voltage`, `Current`), type rows or import CSV / Excel — the table appends a row once the last one is full
+3. Click "+ Formula Column", name it `Resistance` and enter `[Voltage] / [Current]`; the whole column is computed instantly. Standardise with `([Voltage] - mean([Voltage])) / std([Voltage])`, or group with `if([Temp] > 25, 1, 0)`
+4. In the line-binding area point x / y (and z for 3D) at table columns — the curve redraws as the table changes; hit **Pin** when you need a frozen copy
+5. Pick a fit on the Chart tab, add labels in Tools, then export PNG (plus CSV for 2D, OBJ for 3D); the CSV carries formula columns and per-line fit results, and every export is recorded in the plot history and can be restored and regenerated
 
 #### Pomodoro (2.0)
 
