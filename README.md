@@ -57,7 +57,7 @@ AIGC:
 
 | 版本 | 圆盘项数 | 主要差异 |
 | --- | --- | --- |
-| **3.2.6**（当前版本） | 12 | 在 2.3 之上：科学模式改为**整式输入**（维护表达式缓冲区，按 `=` 才由递归下降解析器一次性求值，支持括号 / 运算优先级 / 隐式乘法 / 函数，并新增 π、e、`^`、`%`、±）；绘图数据表支持**多表管理与图线绑定**，删除 / 清空 / 固化 / 解除等危险操作统一二次确认；数据表**填一行自动补一行**；图线重建改为停止输入后再计算；预览区新增「清空图线」兜底入口 |
+| **3.2.6**（当前版本） | 13 | 相对 2.0 累积三组大改：① 新增**矩阵计算**模式（圆盘第 13 项，矩阵 A / B / 结果三级页：加减乘、数乘、转置、行列式、逆、秩、解 Ax=b，运算式只在结果页）；② **绘图页大幅重构**——拆为「直接绘图 / 计算式绘图」双模式，新增全局**数据表**（多表、行列增删、自定义表头直接作为公式变量）、**计算列**（列引用与整列聚合）、**图线绑定表列并实时联动**（可固化 / 解除 / 删除）、图线管理栏与「清空图线」兜底；③ **按钮布局与逻辑关系重做**：控件按四级视觉层级分规格、危险操作统一红系语义色并收敛到单一二次确认弹窗；另含科学模式**整式输入**（按 `=` 一次性求值，支持括号 / 优先级 / 隐式乘法 / 函数 / π / e / `^` / `%` / ±）、数据表**填一行自动补一行**、图线重建延后到停止输入、**i 使用说明面板**扩写为双语逐按钮说明 |
 | 2.3 | 12 | 在 2.0 之上新增：绘图的**多图线**（同一张图内多条曲线，逐线数据 / 颜色 / 拟合）、**导出 CSV**（多线分列并汇总逐线拟合结果）、三维**导出 OBJ**，以及各二级窗口右上角的 **i 使用说明** 面板 |
 | 2.0 | 12 | 在 1.0 全部功能之上新增「番茄钟」：独立窗口、左下角剩余时间胶囊、到时提醒 |
 | 1.0 | 11 | 普通 / 科学 / 汇率 / 重量 / 温度 / 面积 / 速度 / 时间 / 存储 / 进制 / 绘图 |
@@ -66,17 +66,19 @@ AIGC:
 
 ### 功能特性
 
-- **圆盘两级交互**：第一级为悬浮圆盘（2.0 起为 12 项模式），第二级为计算窗口；圆盘中心按钮可让圆盘收缩消失并隐藏窗口
+- **圆盘两级交互**：第一级为悬浮圆盘（2.0 起为 12 项，3.2.6 起新增「矩阵」共 13 项，圆盘半径自适应），第二级为计算窗口；圆盘中心按钮可让圆盘收缩消失并隐藏窗口
 - **普通计算**：四则运算、百分号、多层括号嵌套
 - **科学计算**：sin / cos / tan、log、ln、√、x²、x!、π、e，角度与弧度可切换
 - **汇率换算**：以人民币为基准在线获取实时汇率，离线时使用本地缓存
 - **单位换算**：重量、温度、面积、速度、时间、存储六类
 - **进制转换**：二进制 / 八进制 / 十进制 / 十六进制，输入即时换算
+- **矩阵计算（3.2.6）**：矩阵 A / B 网格编辑（行数列数可调、一键填单位阵），支持 A±B、A×B、k·A、转置、行列式、逆、秩与解 Ax=b；输入页保持纯净，运算式只出现在结果页，结果可复制
 - **实验数据绘图**：
   - 二维图像：手动录入或表格导入数据点，折线 / 光滑曲线，线性、二次、三次、四次、五次、指数、对数、幂律、正弦等拟合并给出 R² / RMSE；支持数据变换（ln x、ln y、log10 x、log10 y、1/x、1/y、y 归一化）、对数轴、范围锁定、平滑强度、双游标、切线、误差棒、波峰 / 波谷标注、均值线、面积、坐标标签、自定义图表标题与坐标轴名称单位
   - 极坐标图：输入关于角度 t 的半径表达式，设定角度范围与采样数，附带同心圆网格、角度线与角度标签
   - 三维图像：表达式曲面 z = f(x, y) 或三维数据点（曲面网格 / 空间线）；拖动旋转、缩放；拟合平面、外推、切平面、两点测量；x / y / z 轴名称、点坐标标签、均值面、误差棒、范围锁定
   - **多图线（2.3）**：同一张图内可添加多条图线，逐线独立的数据、颜色、显示与拟合配置，图例与逐线拟合结果一并绘制与导出
+  - **计算式绘图（3.x）**：绘图页分为「直接绘图 / 计算式绘图」两种模式。计算式绘图下有一套全局数据表（可建多张、任意增删行列、自定义表头，表头可直接当公式变量）；可新增**计算列**（列引用、多参数函数、整列聚合 mean / sum / std / median 等）；图线可绑定表的 x / y / z / 误差列并随表格实时联动，也可固化；另有绘图历史、特征点面板与「清空图线」兜底
   - 曲线数字化（从图片提取数据点）、绘图历史（可恢复数据与设置重新生成）
   - 导出 PNG（屏幕所见即导出所见）、导出 CSV（数据点与拟合结果）、三维导出 OBJ
 - **番茄钟（2.0）**：工作 / 休息时长可自定义（默认 25 / 5 分钟自动循环）；工作结束与休息结束的提醒方式各自独立配置（静音 / 震动 / 响铃 / 响铃 + 震动，响铃与震动强度可调），到时有屏幕边缘光晕呼吸提示；收起后左下角小角常驻显示剩余时间胶囊，可直接开始 / 暂停
@@ -118,7 +120,7 @@ AIGC:
 
 #### 第一级：圆盘
 
-启动应用后显示第一级悬浮圆盘，圆盘上按顺时针依次排列各功能模式（2.0 起依次为：普通、科学、汇率、重量、温度、面积、速度、时间、存储、进制、绘图、番茄钟）。
+启动应用后显示第一级悬浮圆盘，圆盘上按顺时针依次排列各功能模式（3.2.6 起依次为：普通、科学、汇率、重量、温度、面积、速度、时间、存储、进制、绘图、矩阵、番茄钟）。
 
 - 点击任意模式图标 → 圆盘收缩，进入第二级对应页面
 - 点击圆盘中心按钮 → 圆盘向中心收缩消失，并隐藏窗口
@@ -428,7 +430,7 @@ Calculator is a desktop calculator app for macOS built with SwiftUI + AppKit. It
 
 | Version | Wheel items | Key differences |
 | --- | --- | --- |
-| **3.2.6** (current version) | 12 | Over 2.3: the Scientific mode now takes a **whole expression** (buffered, evaluated once by a recursive-descent parser on `=`; brackets, precedence, implicit multiplication, functions, plus π, e, `^`, `%`, ±); the plot data area gains **multiple tables with line binding**, and destructive actions (delete / clear / pin / unpin) share one confirmation dialog; tables **append a fresh row as you fill** the last one; line rebuilding is deferred until typing stops; a "Clear lines" fallback sits next to the plot preview |
+| **3.2.6** (current version) | 13 | Three groups of changes since 2.0: (1) a new **Matrix** mode (13th wheel item; Matrix A / B / Result pages with add, subtract, multiply, scalar multiply, transpose, determinant, inverse, rank and solving Ax=b — the expression appears only on the Result page); (2) a **rebuilt Plot section**, split into "Direct" and "Formula" modes, with global **data tables** (several tables, add / remove rows and columns, custom headers used directly as formula variables), **formula columns** (column references and whole-column aggregates), **lines bound to table columns and updated live** (pinnable / unlinkable / deletable), a line manager bar and a "Clear lines" fallback; (3) **reworked button layout and logic**: controls now follow a four-level visual hierarchy, destructive actions share one red-semantic colour and a single confirmation dialog. Also included: the Scientific mode takes a **whole expression** (evaluated once on `=`; brackets, precedence, implicit multiplication, functions, π, e, `^`, `%`, ±), tables **append a row automatically**, line rebuilding waits until typing stops, and the **i Information panel** is expanded to a bilingual, button-by-button guide |
 | 2.3 | 12 | Adds over 2.0: **multiple lines** in a single plot (per-line data / colour / fit), **CSV export** (columns split per line plus a per-line fit summary), **OBJ export** for 3D, and the **i Information** panel in the top-right corner of every secondary window |
 | 2.0 | 12 | Adds the "Pomodoro" mode on top of everything in 1.0: its own window, a remaining-time pill in the bottom-left corner, and end-of-phase alerts |
 | 1.0 | 11 | Basic / Scientific / Exchange / Weight / Temperature / Area / Speed / Time / Data / Base / Plot |
@@ -437,17 +439,19 @@ Calculator is a desktop calculator app for macOS built with SwiftUI + AppKit. It
 
 ### Features
 
-- **Two-level wheel interaction**: level 1 is a floating wheel (12 modes since 2.0), level 2 is the calculator window; the centre button shrinks the wheel away and hides the window
+- **Two-level wheel interaction**: level 1 is a floating wheel (12 modes since 2.0, 13 since 3.2.6 with the new Matrix mode and an adaptive wheel radius), level 2 is the calculator window; the centre button shrinks the wheel away and hides the window
 - **Basic arithmetic**: the four operators, percent, deeply nested parentheses
 - **Scientific**: sin / cos / tan, log, ln, √, x², x!, π, e, with degree/radian switching
 - **Currency exchange**: live rates with CNY as the base; falls back to a local cache when offline
 - **Unit conversion**: weight, temperature, area, speed, time and data storage
 - **Base conversion**: binary / octal / decimal / hexadecimal, converted as you type
+- **Matrix maths (3.2.6)**: editable A / B grids (adjustable rows and columns, one-click identity), with A±B, A×B, k·A, transpose, determinant, inverse, rank and solving Ax=b; the input page stays clean, expressions only appear on the Result page, and results can be copied
 - **Experimental data plotting**:
   - 2D chart: enter points manually or import a table, draw polylines or smooth curves, fit linear, quadratic, cubic, quartic, quintic, exponential, logarithmic, power-law or sinusoidal models with R² / RMSE; data transforms (ln x, ln y, log10 x, log10 y, 1/x, 1/y, y normalised to 0-1), log axes, range lock, smoothing level, dual cursors, tangents, error bars, peak / valley labels, mean line, area, point labels, custom chart title and axis names/units
   - Polar chart: enter a radius expression in the angle, set the angle range and sample count, with concentric grid, angle lines and angle labels
   - 3D chart: an expression surface z = f(x, y) or 3D data points (surface mesh / 3D line); drag to rotate and scroll to zoom; fitted plane, extrapolation, tangent plane, two-point measurement; x / y / z axis names, point labels, mean plane, error bars, range lock
   - **Multiple lines (2.3)**: add several lines to one chart, each with independent data, colour, visibility and fit settings; the legend and per-line fit results are drawn and exported together
+  - **Formula plotting (3.x)**: the Plot section splits into "Direct" and "Formula" modes. Formula mode brings global data tables (several tables, free row / column editing, custom headers usable as formula variables), **formula columns** (column references, multi-argument functions, whole-column aggregates such as mean / sum / std / median), and **lines bound to the x / y / z / error columns** that track the table live and can be pinned; plus plot history, an extrema panel and a "Clear lines" fallback
   - Curve digitising (extract data points from an image) and plot history (restore the data and settings and regenerate)
   - Export PNG (exactly what you see), export CSV (data points and fit results), and OBJ for 3D
 - **Pomodoro (2.0)**: customisable work / break durations (defaults to 25 / 5 minutes, cycling automatically); independent alert styles for "work ends" and "break ends" (Mute / Vibrate / Ring / Ring + Vibrate, with adjustable intensity) and a breathing glow around the screen edge; when collapsed, the bottom-left corner keeps a remaining-time pill with start / pause
@@ -489,7 +493,7 @@ All versions and release notes live on the [Releases](https://github.com/f8r4ksv
 
 #### Level 1: the wheel
 
-Launching the app shows the level-1 floating wheel, with the modes arranged clockwise (since 2.0: Basic, Scientific, Exchange, Weight, Temperature, Area, Speed, Time, Data, Base, Plot, Pomodoro).
+Launching the app shows the level-1 floating wheel, with the modes arranged clockwise (since 3.2.6: Basic, Scientific, Exchange, Weight, Temperature, Area, Speed, Time, Data, Base, Plot, Matrix, Pomodoro).
 
 - Click any mode icon → the wheel shrinks and the matching level-2 window opens
 - Click the centre button → the wheel shrinks away and the window is hidden
