@@ -19,6 +19,7 @@ AIGC:
 <p align="center">
   <img src="https://img.shields.io/badge/platform-macOS%2015.7%2B-lightgrey" alt="Platform: macOS 15.7+">
   <img src="https://img.shields.io/badge/UI-SwiftUI%20%2B%20AppKit-blue" alt="SwiftUI + AppKit">
+  <img src="https://img.shields.io/badge/arch-Apple%20Silicon%20arm64-black" alt="Apple Silicon">
   <img src="https://img.shields.io/badge/language-%E4%B8%AD%E6%96%87%20%2F%20English-green" alt="中文 / English">
   <img src="https://img.shields.io/github/v/release/f8r4ksv7v4-hub/Calculator?label=release&color=orange" alt="Release">
   <img src="https://img.shields.io/badge/license-MIT-brightgreen" alt="License: MIT">
@@ -49,7 +50,7 @@ AIGC:
   <tr>
     <td align="center"><img src="docs/screenshots/05-polar-fit.jpg" width="320" alt="极坐标绘图与数据拟合"><br><sub>极坐标绘图与数据拟合</sub></td>
     <td align="center"><img src="docs/screenshots/06-3d-spiral.jpg" width="320" alt="三维空间螺旋曲线"><br><sub>三维空间螺旋曲线</sub></td>
-    <td align="center"><img src="docs/screenshots/01-app-icon.jpg" width="320" alt="App 图标"><br><sub>App 图标</sub></td>
+    <td align="center"></td>
   </tr>
 </table>
 
@@ -98,12 +99,16 @@ AIGC:
 
 | 版本 | 圆盘项数 | 主要差异 |
 | --- | --- | --- |
-| **3.2.6**（当前版本） | 13 | 相对 2.0 累积三组大改：① **计算式绘图（本轮主打）**——绘图页从「录点画线」升级为实验数据处理工作站：全局**数据表**（多表切换、行列增删、自定义表头**直接作为公式变量**、填满末行自动补行、CSV / Excel 导入）、**计算列**（列引用 `[列名]`、`^` 幂与比较、`ln / log / sqrt / if / pow / mod / atan2` 等函数、整列聚合 `mean / sum / std / stdp / median / range` 等，一条公式算出整列，聚合自动铺满每一行）、**图线绑定表列实时联动**（x / y / z / 误差，可固化 / 解除 / 删除），并具备依赖拓扑排序、循环引用检测、逐列缓存、列重命名自动同步公式等工程化内核；② 新增**矩阵计算**模式（圆盘第 13 项，矩阵 A / B / 结果三级页：加减乘、数乘、转置、行列式、逆、秩、解 Ax=b，运算式只在结果页）；③ **按钮布局与逻辑关系重做**：控件按四级视觉层级分规格、危险操作统一红系语义色并收敛到单一二次确认弹窗；另含绘图页双模式拆分与「清空图线」兜底、科学模式**整式输入**（按 `=` 一次性求值，支持括号 / 优先级 / 隐式乘法 / 函数 / π / e / `^` / `%` / ±）、图线重建延后到停止输入、**i 使用说明面板**扩写为双语逐按钮说明 |
+| **3.3.3**（当前版本） | 13 | 位置记忆修复：① **拖到右半边记不住** —— 原生 `performDrag` 在非激活面板 / 后台应用状态下会提前返回，松手瞬间读到的 `frame.origin` 还是拖拽前的旧值，位置记忆于是永远慢一步；现在改为等鼠标真正抬起、窗口落位后再取最终 frame 落盘；② **钳制放宽** —— 旧逻辑要求整窗都落在可见区内，1280pt 屏上 700pt 宽的矩阵窗最右只能到 x=572（正好屏幕正中），拖到右半边一重开就被拉回中间；现在只保证横向至少 160pt 可见、顶栏拖拽条抓得到，顶边不进菜单栏，宽窗口也能稳定停在右半边 |
+| 3.3.2 | 13 | ① **设置面板三次重做** —— 弃用 `.sheet`（会反复弹出、关不掉），改为单例系统标题栏窗口，Esc 关闭、⌘, 唤起，菜单展开前重绑快捷键，保证唯一窗口不回弹；② **设置窗置顶** —— 窗口层级提到 `statusBar + 2`，不再被计算器主面板遮挡（此前层级代码误写进常驻隐形窗口，被后续 `.normal` 覆盖）；③ **主题跟随系统立即生效** —— 选中「跟随系统」后显式同步 `NSApp.appearance` 与各窗口 appearance，白天选深色再切回跟随系统能立刻变回浅色；④ **退回圆盘动画重做** —— 方形窗口朝自身中心收起淡出，圆盘随即从屏幕正中展开，不再有「先滑回中间」的过渡 |
+| 3.3.1 | 13 | 3.3.0 的手感补丁，全部围绕「窗口动效」：① **拖拽改原生接管** —— 旧实现用 `DragGesture` 做窗口拖动，在 macOS 窗口坐标系下会产生累积漂移（越拖越偏），改为 `NSViewRepresentable` 包一个拖拽区直接调 `NSWindow.performDrag(with:)`；② **退回圆盘不再卡顿** —— 窗口位移改由 `NSView.displayLink` 对齐屏幕刷新逐帧驱动（原来用 60 Hz `Timer`，与 120 Hz 屏不同步、帧间隔抖动），且回圆盘时只滑动位置、不逐帧改窗口尺寸，配合内容纯淡出，滑动与收缩同帧对齐；③ 番茄钟窗口顶栏中部同样改为原生拖拽并记忆位置 |
+| 3.3.0 | 13 | 一次以体验为主的改版：① **设置面板重做** —— 改为与「历史记录」侧栏同源的无边框圆角毛玻璃窗口，自绘分区卡片、悬停高亮行与胶囊开关，标题栏可拖动移动；② **登录时启动** —— 首选 `SMAppService` 系统登录项，注册失败（应用不在「应用程序」文件夹、未公证等）自动改用 `~/Library/LaunchAgents` 用户级启动项，因此在任何 Mac 的任何目录下都能生效，关闭时 bootout + 删除 plist 不留残余；③ **窗口可拖动** —— 第二级计算窗口与番茄钟窗口的顶栏中部整块空白即拖拽区，位置会被记住（换显示器或改分辨率自动回落居中），圆盘作为主入口强制居中、不记忆位置 |
+| 3.2.6 | 13 | 相对 2.0 累积三组大改：① **计算式绘图（本轮主打）**——绘图页从「录点画线」升级为实验数据处理工作站：全局**数据表**（多表切换、行列增删、自定义表头**直接作为公式变量**、填满末行自动补行、CSV / Excel 导入）、**计算列**（列引用 `[列名]`、`^` 幂与比较、`ln / log / sqrt / if / pow / mod / atan2` 等函数、整列聚合 `mean / sum / std / stdp / median / range` 等，一条公式算出整列，聚合自动铺满每一行）、**图线绑定表列实时联动**（x / y / z / 误差，可固化 / 解除 / 删除），并具备依赖拓扑排序、循环引用检测、逐列缓存、列重命名自动同步公式等工程化内核；② 新增**矩阵计算**模式（圆盘第 13 项，矩阵 A / B / 结果三级页：加减乘、数乘、转置、行列式、逆、秩、解 Ax=b，运算式只在结果页）；③ **按钮布局与逻辑关系重做**：控件按四级视觉层级分规格、危险操作统一红系语义色并收敛到单一二次确认弹窗；另含绘图页双模式拆分与「清空图线」兜底、科学模式**整式输入**（按 `=` 一次性求值，支持括号 / 优先级 / 隐式乘法 / 函数 / π / e / `^` / `%` / ±）、图线重建延后到停止输入、**i 使用说明面板**扩写为双语逐按钮说明 |
 | 2.3 | 12 | 在 2.0 之上新增：绘图的**多图线**（同一张图内多条曲线，逐线数据 / 颜色 / 拟合）、**导出 CSV**（多线分列并汇总逐线拟合结果）、三维**导出 OBJ**，以及各二级窗口右上角的 **i 使用说明** 面板 |
 | 2.0 | 12 | 在 1.0 全部功能之上新增「番茄钟」：独立窗口、左下角剩余时间胶囊、到时提醒 |
 | 1.0 | 11 | 普通 / 科学 / 汇率 / 重量 / 温度 / 面积 / 速度 / 时间 / 存储 / 进制 / 绘图 |
 
-> 说明：当前 [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面提供的官方安装包为 **3.2.6**、**2.0** 与 **1.0**。应用内的「检查更新」只会下载 Release 中名称含 `macOS` 的 zip 资产。
+> 说明：**3.3.3 已发布**，[Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面上最新安装包为 **3.3.3**（资产名 `Calculator-3.3.3-macOS.zip`），另有 **3.2.6**、**2.0** 与 **1.0**。应用内的「检查更新」只会下载 Release 中名称含 `macOS` 的 zip 资产。全版本零第三方依赖，仅使用系统框架（SwiftUI / AppKit / ServiceManagement / QuartzCore / Compression）。
 
 ### 功能特性
 
@@ -132,26 +137,35 @@ AIGC:
 - **历史记录**：普通与科学模式保留最近 20 条计算历史，重启后仍在
 - **中英双语**：界面一键切换中文 / English，即时生效
 - **外观与触发**：跟随系统深浅色或手动固定；可隐藏 Dock 图标，仅保留屏幕左下角触发展开
+- **窗口拖拽与位置记忆（3.3.0）**：第二级计算窗口与番茄钟窗口可在顶栏中部直接拖动，松手即记住位置，下次打开沿用（记忆点不在任何屏幕内时自动回落居中）；圆盘作为主入口始终居中
+- **设置面板（3.3.0 重做）**：无边框圆角毛玻璃窗口，「语言 / 通用 / 外观 / 关于」四区分组卡片，行悬停高亮、胶囊开关，标题栏可拖动
+- **登录时启动（3.3.0）**：优先生成系统登录项（可在「系统设置 › 通用 › 登录项」管理）；应用不在「应用程序」文件夹、签名不受信任等情况下自动改用用户级启动项，任何 Mac 上都能开机自启；需系统批准时设置页给出直达入口，失败原因直接显示在开关下方
+- **窗口动效（3.3.1）**：圆盘 ↔ 计算窗口的位移与缩小由显示刷新逐帧驱动，内容淡出与窗口滑动同帧对齐，收起 / 返回全程不掉帧
+- **窗口位置记忆（3.3.3）**：把计算窗口 / 番茄钟窗口拖到屏幕右半边后位置真正记住了 —— 改为窗口落位后再取最终 frame 落盘（此前原生拖拽在面板非激活时提前返回，存下的是拖拽前旧原点），同时钳制放宽到只需 160pt 可见，宽窗口不再被拉回正中
 - **自动更新**：基于 GitHub Releases 自动检查、下载并原位安装新版本
 
 ### 环境要求
 
 - macOS 15.7 或更高版本
 - Apple Silicon（arm64）Mac
+- 安装包约 4 MB，全部基于系统框架（SwiftUI / AppKit / ServiceManagement / QuartzCore / Compression），无任何第三方依赖
 
 ### 下载
 
 | 版本 | 安装包 | 大小 | 下载直链 |
 | --- | --- | --- | --- |
-| **3.2.6**（推荐） | `Calculator-3.2.6-macOS.zip` | 约 3.6 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.2.6/Calculator-3.2.6-macOS.zip) |
+| **3.3.3**（推荐） | `Calculator-3.3.3-macOS.zip` | 约 3.7 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.3.3/Calculator-3.3.3-macOS.zip) |
+| 3.2.6 | `Calculator-3.2.6-macOS.zip` | 约 3.6 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.2.6/Calculator-3.2.6-macOS.zip) |
 | 2.0 | `Calculator-2.0-macOS.zip` | 约 2.0 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v2.0/Calculator-2.0-macOS.zip) |
 | 1.0 | `Calculator-1.0-macOS.zip` | 约 1.9 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v1.0/Calculator-1.0-macOS.zip) |
+
+> 3.3.3 为当前最新版本（含设置面板重做、主题跟随系统、窗口位置记忆修复）。
 
 全部版本与更新日志见 [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面。
 
 ### 安装与首次启动
 
-1. 打开本仓库的 [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面，下载对应版本的安装包（`Calculator-3.2.6-macOS.zip`、`Calculator-2.0-macOS.zip` 或 `Calculator-1.0-macOS.zip`）
+1. 打开本仓库的 [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面，下载对应版本的安装包（当前推荐 `Calculator-3.3.3-macOS.zip`，历史版本 `Calculator-3.2.6-macOS.zip` / `Calculator-2.0-macOS.zip` / `Calculator-1.0-macOS.zip`）
 2. 双击解压得到「计算器.app」，拖入「应用程序」文件夹
 3. **首次启动会被 Gatekeeper 拦截**：安装包为开发者签名、未经 Apple 公证，系统会提示「无法验证开发者」或「Apple 无法检查其是否包含恶意软件」。按以下任一方式放行即可：
    - 在「访达」中 **按住 Control 点击（或右键）**「计算器.app」→ 选择「打开」→ 在弹窗中再次点击「打开」
@@ -170,9 +184,11 @@ AIGC:
 
 - 点击任意模式图标 → 圆盘收缩，进入第二级对应页面
 - 点击圆盘中心按钮 → 圆盘向中心收缩消失，并隐藏窗口
+- 圆盘始终位于屏幕正中，不跟随拖动（3.3.0 起）
 
 #### 第二级：计算窗口
 
+- 拖动窗口：按住顶栏中部的整块空白处拖动即可（3.3.0 起），松手后位置会被记住，下次展开沿用；圆盘本身不可拖动，始终居中
 - 顶部左侧「返回」→ 回到第一级圆盘
 - 顶部右侧分别为「收起」与「设置」；2.3 起「设置」左侧另有 **i** 使用说明入口
 - 点击「收起」（或按 ⌘W / ↓）→ 窗口缩为屏幕左下角的小角
@@ -380,8 +396,10 @@ AIGC:
 
 **设置内容**：
 
+> 3.3.0 起设置面板重做为无边框圆角毛玻璃窗口（与「历史记录」侧栏同一套视觉），标题栏可拖动；分区小标题 + 卡片 + 悬停高亮行 + 胶囊开关。
+
 - 语言：中文 / English，切换后全界面立即生效，无需重启
-- 通用：隐藏 Dock 图标（开启后应用从 Dock 消失，仅保留屏幕左下角触发）
+- 通用：隐藏 Dock 图标（开启后应用从 Dock 消失，仅保留屏幕左下角触发）；登录时启动（系统登录项不可用时自动降级为用户级启动项，需系统批准时面板内给出跳转入口，失败原因直接显示在开关下方）
 - 外观模式：跟随系统 / 手动固定深浅色
 - 关于：作者、版本、打赏作者、检查更新、问题反馈
 
@@ -429,7 +447,13 @@ macOS 15.7 或更高版本，Apple Silicon（arm64）Mac。
 **Q12：怎么更新到新版本？**
 应用启动时会自动检查 GitHub Releases，也可在「设置 → 关于 → 检查更新」手动检查；更新过程会自动备份旧版本，替换失败会自动回滚。
 
-**Q13：在哪里看使用说明？**
+**Q13：窗口能拖到屏幕其它位置吗？圆盘为什么总是居中？**
+可以。3.3.0 起，第二级计算窗口与番茄钟窗口按住**顶栏中部空白处**即可拖动，松手后位置会被记住，下次展开沿用（换显示器或改分辨率后自动回落居中）。圆盘作为主入口始终固定在屏幕正中，不参与拖动、也不记忆位置。
+
+**Q14：登录时启动开关打开了，重启后没生效？**
+先看设置页开关下方是否有提示：若应用不在「应用程序」文件夹、或安装包未经公证，系统登录项（`SMAppService`）会注册失败，此时应用会自动改用 `~/Library/LaunchAgents` 下的用户级启动项，同样能开机自启；若系统要求你在「系统设置 › 通用 › 登录项」中手动允许，设置页会显示「需在系统设置中允许」的入口，点进去允许即可。
+
+**Q15：在哪里看使用说明？**
 2.3 起，主计算窗口、番茄钟窗口、图像标定取点窗口的右上角都有 **i** 按钮，打开即为中英双语使用说明面板。
 
 ### 支持与反馈
@@ -525,12 +549,16 @@ Plotting used to be "type points, draw a line". In 3.x it is a small data-reduct
 
 | Version | Wheel items | Key differences |
 | --- | --- | --- |
-| **3.2.6** (current version) | 13 | Three groups of changes since 2.0: (1) a new **Matrix** mode (13th wheel item; Matrix A / B / Result pages with add, subtract, multiply, scalar multiply, transpose, determinant, inverse, rank and solving Ax=b — the expression appears only on the Result page); (2) a **rebuilt Plot section**, split into "Direct" and "Formula" modes, with global **data tables** (several tables, add / remove rows and columns, custom headers used directly as formula variables), **formula columns** (column references and whole-column aggregates), **lines bound to table columns and updated live** (pinnable / unlinkable / deletable), a line manager bar and a "Clear lines" fallback; (3) **reworked button layout and logic**: controls now follow a four-level visual hierarchy, destructive actions share one red-semantic colour and a single confirmation dialog. Also included: the Scientific mode takes a **whole expression** (evaluated once on `=`; brackets, precedence, implicit multiplication, functions, π, e, `^`, `%`, ±), tables **append a row automatically**, line rebuilding waits until typing stops, and the **i Information panel** is expanded to a bilingual, button-by-button guide |
+| **3.3.3** (current version) | 13 | Position-memory fix: (1) **the right half of the screen was never remembered** — the native `performDrag` returns early while the panel is inactive or the app is in the background, so `frame.origin` read at mouse-up was still the pre-drag value and every save lagged one drag behind; it now waits for the button to be released and the window to settle before writing the final frame; (2) **relaxed clamping** — the old rule demanded the whole window be visible, which on a 1280pt display capped a 700pt matrix window at x=572 (dead centre) and snapped it back on reopen; now only 160pt of horizontal visibility plus a grabbable title bar is required, with the top edge kept below the menu bar, so wide windows stay where you drop them on the right half |
+| 3.3.2 | 13 | (1) **Settings panel rebuilt a third time** — `.sheet` was dropped (it kept re-presenting and could not be dismissed) in favour of a singleton window with a system title bar, closed with Esc, summoned with ⌘, and re-bound before the menu opens so only one window ever exists; (2) **Settings window on top** — its level was raised to `statusBar + 2` so the calculator panel can no longer cover it (the level code had been written into a resident invisible window and overwritten by a later `.normal`); (3) **system appearance applies immediately** — choosing "Follow System" now syncs `NSApp.appearance` and each window's appearance explicitly, so picking dark by day and switching back turns light again at once; (4) **new return-to-wheel animation** — the panel folds into its own centre and fades, then the wheel expands from the screen centre, with no more "slide back to the middle" transition |
+| 3.3.1 | 13 | A feel-and-polish patch for 3.3.0, all about window motion: (1) **native window dragging** — the previous `DragGesture` implementation accumulated drift in the macOS window coordinate space (the window lagged further behind the longer you dragged), now replaced by an `NSViewRepresentable` drag area calling `NSWindow.performDrag(with:)` directly; (2) **no more stutter when returning to the wheel** — the panel is now moved by an `NSView.displayLink` frame callback aligned to the display refresh (the old 60 Hz `Timer` was out of step with 120 Hz screens, so frame intervals jittered), and the glide back to the wheel changes position only instead of resizing the window every frame, paired with a pure opacity fade so the slide and the shrink land on the same frames; (3) the Pomodoro window drags natively too and remembers its position |
+| 3.3.0 | 13 | An experience-focused release: (1) **rebuilt Settings panel** — now a borderless, rounded, translucent window sharing the look of the History sidebar, with hand-drawn section cards, hover-highlighted rows and pill switches, draggable by its header; (2) **Launch at Login** — tries a `SMAppService` login item first, and when registration fails (app outside Applications, unsigned / un-notarised, etc.) falls back to a per-user `~/Library/LaunchAgents` agent, so it works on any Mac in any folder and leaves nothing behind when switched off; (3) **draggable windows** — the blank middle of the top bar is the drag area for both the calculator and Pomodoro windows, and the position is remembered (falling back to centred when the display changes), while the wheel itself stays centred and never remembers a position |
+| 3.2.6 | 13 | Three groups of changes since 2.0: (1) a new **Matrix** mode (13th wheel item; Matrix A / B / Result pages with add, subtract, multiply, scalar multiply, transpose, determinant, inverse, rank and solving Ax=b — the expression appears only on the Result page); (2) a **rebuilt Plot section**, split into "Direct" and "Formula" modes, with global **data tables** (several tables, add / remove rows and columns, custom headers used directly as formula variables), **formula columns** (column references and whole-column aggregates), **lines bound to table columns and updated live** (pinnable / unlinkable / deletable), a line manager bar and a "Clear lines" fallback; (3) **reworked button layout and logic**: controls now follow a four-level visual hierarchy, destructive actions share one red-semantic colour and a single confirmation dialog. Also included: the Scientific mode takes a **whole expression** (evaluated once on `=`; brackets, precedence, implicit multiplication, functions, π, e, `^`, `%`, ±), tables **append a row automatically**, line rebuilding waits until typing stops, and the **i Information panel** is expanded to a bilingual, button-by-button guide |
 | 2.3 | 12 | Adds over 2.0: **multiple lines** in a single plot (per-line data / colour / fit), **CSV export** (columns split per line plus a per-line fit summary), **OBJ export** for 3D, and the **i Information** panel in the top-right corner of every secondary window |
 | 2.0 | 12 | Adds the "Pomodoro" mode on top of everything in 1.0: its own window, a remaining-time pill in the bottom-left corner, and end-of-phase alerts |
 | 1.0 | 11 | Basic / Scientific / Exchange / Weight / Temperature / Area / Speed / Time / Data / Base / Plot |
 
-> Note: the official installers currently available on the [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page are **3.2.6**, **2.0** and **1.0**. The in-app "Check for Updates" only downloads zip assets whose name contains `macOS`.
+> Note: **3.3.3 is published.** The newest installer on the [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page is **3.3.3** (asset name `Calculator-3.3.3-macOS.zip`), alongside **3.2.6**, **2.0** and **1.0**. The in-app "Check for Updates" only downloads zip assets whose name contains `macOS`. Every version is dependency-free and builds only on system frameworks (SwiftUI / AppKit / ServiceManagement / QuartzCore / Compression).
 
 ### Features
 
@@ -554,26 +582,35 @@ Plotting used to be "type points, draw a line". In 3.x it is a small data-reduct
 - **History**: basic and scientific modes keep the last 20 calculations across launches
 - **Bilingual UI**: switch between 中文 / English instantly
 - **Appearance & trigger**: follow the system light/dark appearance or pin your own; hide the Dock icon and keep only the bottom-left corner trigger
+- **Draggable windows with remembered positions (3.3.0)**: the calculator and Pomodoro windows drag by the blank middle of their top bar and remember where you left them (falling back to centred when the saved point is off every display); the wheel, as the main entry point, always stays centred
+- **Settings panel (rebuilt in 3.3.0)**: a borderless, rounded, translucent window with four grouped cards (Language / General / Appearance / About), hover-highlighted rows, pill switches and a draggable header
+- **Launch at Login (3.3.0)**: creates a system login item (manageable in System Settings › General › Login Items); when the app lives outside Applications or its signature is not trusted, it automatically switches to a per-user launch agent so it still starts on any Mac — the panel offers a direct link when the system asks for approval and shows the failure reason under the switch
+- **Window motion (3.3.1)**: the move and shrink between the wheel and the calculator window are driven by the display refresh, so the content fade and the window glide land on the same frames — no dropped frames going in or out
+- **Window position memory (3.3.3)**: dragging the calculator or Pomodoro window to the right-hand side of the screen now sticks — the final frame is captured after the window settles instead of from the pre-drag origin, and clamping only requires 160pt of the window to stay visible
 - **Auto update**: checks, downloads and installs new versions in place from GitHub Releases
 
 ### Requirements
 
 - macOS 15.7 or later
 - Apple Silicon (arm64) Mac
+- About 4 MB, built entirely on system frameworks (SwiftUI / AppKit / ServiceManagement / QuartzCore / Compression) with no third-party dependencies
 
 ### Download
 
 | Version | Installer | Size | Direct link |
 | --- | --- | --- | --- |
-| **3.2.6** (recommended) | `Calculator-3.2.6-macOS.zip` | ~3.6 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.2.6/Calculator-3.2.6-macOS.zip) |
+| **3.3.3** (recommended) | `Calculator-3.3.3-macOS.zip` | ~3.7 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.3.3/Calculator-3.3.3-macOS.zip) |
+| 3.2.6 | `Calculator-3.2.6-macOS.zip` | ~3.6 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.2.6/Calculator-3.2.6-macOS.zip) |
 | 2.0 | `Calculator-2.0-macOS.zip` | ~2.0 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v2.0/Calculator-2.0-macOS.zip) |
 | 1.0 | `Calculator-1.0-macOS.zip` | ~1.9 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v1.0/Calculator-1.0-macOS.zip) |
+
+> 3.3.3 is the current release (rebuilt Settings panel, system appearance support, window position-memory fix).
 
 All versions and release notes live on the [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page.
 
 ### Installation & First Launch
 
-1. Open this repository's [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page and download the installer you need (`Calculator-3.2.6-macOS.zip`, `Calculator-2.0-macOS.zip` or `Calculator-1.0-macOS.zip`)
+1. Open this repository's [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page and download the installer you need (`Calculator-3.3.3-macOS.zip` recommended; `Calculator-3.2.6-macOS.zip`, `Calculator-2.0-macOS.zip` and `Calculator-1.0-macOS.zip` for older versions)
 2. Double-click to unzip "计算器.app" and drag it into your Applications folder
 3. **Gatekeeper will block the first launch**: the installer is developer-signed but not notarised by Apple, so macOS reports "cannot verify the developer" or "Apple cannot check it for malicious software". Let it through using any of these:
    - In Finder, **Control-click (or right-click)** "计算器.app" → choose "Open" → click "Open" again in the dialog
@@ -592,9 +629,11 @@ Launching the app shows the level-1 floating wheel, with the modes arranged cloc
 
 - Click any mode icon → the wheel shrinks and the matching level-2 window opens
 - Click the centre button → the wheel shrinks away and the window is hidden
+- The wheel always stays in the centre of the screen and does not follow dragging (since 3.3.0)
 
 #### Level 2: the calculator window
 
+- Drag the window: hold the blank middle of the top bar and drag (since 3.3.0); the position is remembered and reused next time, while the wheel itself cannot be dragged and stays centred
 - Top-left "Back" → return to the level-1 wheel
 - Top-right holds "Collapse" and "Settings"; since 2.3 the **i** Information entry sits next to "Settings"
 - Clicking "Collapse" (or pressing ⌘W / ↓) shrinks the window into the bottom-left corner of the screen
@@ -801,8 +840,10 @@ Notes: in the level-2 window you can type directly with the keyboard; on the lev
 
 **What it contains**:
 
+> Since 3.3.0 the Settings panel is a borderless, rounded, translucent window (same visual language as the History sidebar) with a draggable header, section headings, cards, hover-highlighted rows and pill switches.
+
 - Language: 中文 / English, applied across the whole UI immediately without a restart
-- General: hide the Dock icon (the app disappears from the Dock and only the bottom-left corner trigger remains)
+- General: hide the Dock icon (the app disappears from the Dock and only the bottom-left corner trigger remains); Launch at Login (falls back to a per-user launch agent when the system login item is unavailable, offers a jump to System Settings when approval is required, and shows the failure reason under the switch)
 - Appearance: follow the system or pin light / dark manually
 - About: author, version, tip the author, check for updates, send feedback
 
@@ -850,7 +891,13 @@ Settings → Language → English. The whole UI updates immediately without a re
 **Q12: How do I update to a newer version?**
 The app checks GitHub Releases on launch, or you can check manually in "Settings → About → Check for Updates". The updater backs up the old version automatically and rolls back if the replacement fails.
 
-**Q13: Where can I find the usage guide?**
+**Q13: Can I move the window elsewhere on screen? Why is the wheel always centred?**
+Yes. Since 3.3.0 the calculator and Pomodoro windows drag by holding the blank middle of the top bar, and the position is remembered for next time (falling back to centred after a display change). The wheel is the main entry point: it is pinned to the centre of the screen and neither drags nor remembers a position.
+
+**Q14: I turned on Launch at Login but the app did not start after a reboot?**
+Check the hint under the switch first. If the app is outside Applications or the installer is not notarised, the system login item (`SMAppService`) cannot register, and the app automatically falls back to a per-user launch agent in `~/Library/LaunchAgents`, which starts it just as well. If macOS asks you to allow it in System Settings › General › Login Items, the panel shows an "Approval Required" entry — open it and allow the app.
+
+**Q15: Where can I find the usage guide?**
 Since 2.3, the main calculator window, the Pomodoro window and the image calibration window all have an **i** button in their top-right corner that opens the bilingual Information panel.
 
 ### Support & Feedback
