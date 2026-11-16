@@ -99,7 +99,8 @@ AIGC:
 
 | 版本 | 圆盘项数 | 主要差异 |
 | --- | --- | --- |
-| **3.3.4**（当前版本） | 13 | 检查更新弹窗不再被遮挡：手动「检查更新」弹出的「已是最新」提示框此前未设窗口层级，默认 `.modalPanel`(8) 低于主面板 `.floating`(3) 之外的角窗 `.statusBar`(25) 与设置窗 `statusBar + 2`(27)，被压住且 `runModal` 模态会吞掉点击，表现为 OK 点不到、App 卡死。现新增统一 `presentAlert(_:)` —— 弹出前把层级 ≥ `.floating` 的自家窗口临时降为 `.normal`，弹窗层级提到 `statusBar + 3`(28) 并主动激活 App，关闭后按原值逐窗恢复；覆盖「已是最新 / 发现新版本 / 签名团队不一致 / 通用错误」四处提示框 |
+| **3.3.5**（当前版本） | 13 | 动画统一（本轮全部围绕展开 / 收起手感）：① **其它功能展开不再卡顿** —— 此前展开时逐帧修改窗口尺寸，每一帧都要重排整棵 SwiftUI 树，与圆盘 / 功能页的内容过渡抢帧；现改为尺寸一次性落位，只做位置与内容过渡，窗口位移时长与内容过渡统一为 0.38s、同起同止；② **番茄钟收起改为滑回左下角** —— 由原地缩小淡出改为朝隐藏位滑出 0.24s，与其它功能的收起节奏、缓动完全一致；③ **番茄钟展开保持原地展开 + 内容层缩放淡入**，作为其它功能的参照实现 |
+| 3.3.4 | 13 | 检查更新弹窗不再被遮挡：手动「检查更新」弹出的「已是最新」提示框此前未设窗口层级，默认 `.modalPanel`(8) 低于主面板 `.floating`(3) 之外的角窗 `.statusBar`(25) 与设置窗 `statusBar + 2`(27)，被压住且 `runModal` 模态会吞掉点击，表现为 OK 点不到、App 卡死。现新增统一 `presentAlert(_:)` —— 弹出前把层级 ≥ `.floating` 的自家窗口临时降为 `.normal`，弹窗层级提到 `statusBar + 3`(28) 并主动激活 App，关闭后按原值逐窗恢复；覆盖「已是最新 / 发现新版本 / 签名团队不一致 / 通用错误」四处提示框 |
 | 3.3.3 | 13 | 位置记忆修复：① **拖到右半边记不住** —— 原生 `performDrag` 在非激活面板 / 后台应用状态下会提前返回，松手瞬间读到的 `frame.origin` 还是拖拽前的旧值，位置记忆于是永远慢一步；现在改为等鼠标真正抬起、窗口落位后再取最终 frame 落盘；② **钳制放宽** —— 旧逻辑要求整窗都落在可见区内，1280pt 屏上 700pt 宽的矩阵窗最右只能到 x=572（正好屏幕正中），拖到右半边一重开就被拉回中间；现在只保证横向至少 160pt 可见、顶栏拖拽条抓得到，顶边不进菜单栏，宽窗口也能稳定停在右半边 |
 | 3.3.2 | 13 | ① **设置面板三次重做** —— 弃用 `.sheet`（会反复弹出、关不掉），改为单例系统标题栏窗口，Esc 关闭、⌘, 唤起，菜单展开前重绑快捷键，保证唯一窗口不回弹；② **设置窗置顶** —— 窗口层级提到 `statusBar + 2`，不再被计算器主面板遮挡（此前层级代码误写进常驻隐形窗口，被后续 `.normal` 覆盖）；③ **主题跟随系统立即生效** —— 选中「跟随系统」后显式同步 `NSApp.appearance` 与各窗口 appearance，白天选深色再切回跟随系统能立刻变回浅色；④ **退回圆盘动画重做** —— 方形窗口朝自身中心收起淡出，圆盘随即从屏幕正中展开，不再有「先滑回中间」的过渡 |
 | 3.3.1 | 13 | 3.3.0 的手感补丁，全部围绕「窗口动效」：① **拖拽改原生接管** —— 旧实现用 `DragGesture` 做窗口拖动，在 macOS 窗口坐标系下会产生累积漂移（越拖越偏），改为 `NSViewRepresentable` 包一个拖拽区直接调 `NSWindow.performDrag(with:)`；② **退回圆盘不再卡顿** —— 窗口位移改由 `NSView.displayLink` 对齐屏幕刷新逐帧驱动（原来用 60 Hz `Timer`，与 120 Hz 屏不同步、帧间隔抖动），且回圆盘时只滑动位置、不逐帧改窗口尺寸，配合内容纯淡出，滑动与收缩同帧对齐；③ 番茄钟窗口顶栏中部同样改为原生拖拽并记忆位置 |
@@ -109,7 +110,7 @@ AIGC:
 | 2.0 | 12 | 在 1.0 全部功能之上新增「番茄钟」：独立窗口、左下角剩余时间胶囊、到时提醒 |
 | 1.0 | 11 | 普通 / 科学 / 汇率 / 重量 / 温度 / 面积 / 速度 / 时间 / 存储 / 进制 / 绘图 |
 
-> 说明：**3.3.4 已发布**，[Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面上最新安装包为 **3.3.4**（资产名 `Calculator-3.3.4-macOS.zip`），另有 **3.2.6**、**2.0** 与 **1.0**。应用内的「检查更新」只会下载 Release 中名称含 `macOS` 的 zip 资产。全版本零第三方依赖，仅使用系统框架（SwiftUI / AppKit / ServiceManagement / QuartzCore / Compression）。
+> 说明：**3.3.5 已发布**，[Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面上最新安装包为 **3.3.5**（资产名 `Calculator-3.3.5-macOS.zip`），另有 **3.2.6**、**2.0** 与 **1.0**。应用内的「检查更新」只会下载 Release 中名称含 `macOS` 的 zip 资产。全版本零第三方依赖，仅使用系统框架（SwiftUI / AppKit / ServiceManagement / QuartzCore / Compression）。
 
 ### 功能特性
 
@@ -141,7 +142,7 @@ AIGC:
 - **窗口拖拽与位置记忆（3.3.0）**：第二级计算窗口与番茄钟窗口可在顶栏中部直接拖动，松手即记住位置，下次打开沿用（记忆点不在任何屏幕内时自动回落居中）；圆盘作为主入口始终居中
 - **设置面板（3.3.0 重做）**：无边框圆角毛玻璃窗口，「语言 / 通用 / 外观 / 关于」四区分组卡片，行悬停高亮、胶囊开关，标题栏可拖动
 - **登录时启动（3.3.0）**：优先生成系统登录项（可在「系统设置 › 通用 › 登录项」管理）；应用不在「应用程序」文件夹、签名不受信任等情况下自动改用用户级启动项，任何 Mac 上都能开机自启；需系统批准时设置页给出直达入口，失败原因直接显示在开关下方
-- **窗口动效（3.3.1）**：圆盘 ↔ 计算窗口的位移与缩小由显示刷新逐帧驱动，内容淡出与窗口滑动同帧对齐，收起 / 返回全程不掉帧
+- **窗口动效（3.3.1 / 3.3.5）**：圆盘 ↔ 计算窗口的位移与缩小由显示刷新逐帧驱动，内容淡出与窗口滑动同帧对齐；3.3.5 起其它功能展开时窗口尺寸一次性落位、只动画位置，与内容过渡同长同起止，展开不再卡顿，番茄钟收起也与其它功能保持一致（滑回左下角，0.24s）
 - **窗口位置记忆（3.3.3）**：把计算窗口 / 番茄钟窗口拖到屏幕右半边后位置真正记住了 —— 改为窗口落位后再取最终 frame 落盘（此前原生拖拽在面板非激活时提前返回，存下的是拖拽前旧原点），同时钳制放宽到只需 160pt 可见，宽窗口不再被拉回正中
 - **自动更新**：基于 GitHub Releases 自动检查、下载并原位安装新版本
 
@@ -155,19 +156,20 @@ AIGC:
 
 | 版本 | 安装包 | 大小 | 下载直链 |
 | --- | --- | --- | --- |
-| **3.3.4**（推荐） | `Calculator-3.3.4-macOS.zip` | 约 3.7 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.3.4/Calculator-3.3.4-macOS.zip) |
+| **3.3.5**（推荐） | `Calculator-3.3.5-macOS.zip` | 约 3.7 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.3.5/Calculator-3.3.5-macOS.zip) |
+| 3.3.4 | `Calculator-3.3.4-macOS.zip` | 约 3.7 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.3.4/Calculator-3.3.4-macOS.zip) |
 | 3.3.3 | `Calculator-3.3.3-macOS.zip` | 约 3.7 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.3.3/Calculator-3.3.3-macOS.zip) |
 | 3.2.6 | `Calculator-3.2.6-macOS.zip` | 约 3.6 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.2.6/Calculator-3.2.6-macOS.zip) |
 | 2.0 | `Calculator-2.0-macOS.zip` | 约 2.0 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v2.0/Calculator-2.0-macOS.zip) |
 | 1.0 | `Calculator-1.0-macOS.zip` | 约 1.9 MB | [下载](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v1.0/Calculator-1.0-macOS.zip) |
 
-> 3.3.4 为当前最新版本（含检查更新弹窗遮挡修复、窗口位置记忆、设置面板重做、主题跟随系统）。
+> 3.3.5 为当前最新版本（含展开动画顺滑化、番茄钟收起与其它功能统一）。
 
 全部版本与更新日志见 [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面。
 
 ### 安装与首次启动
 
-1. 打开本仓库的 [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面，下载对应版本的安装包（当前推荐 `Calculator-3.3.4-macOS.zip`，历史版本 `Calculator-3.3.3-macOS.zip` / `Calculator-3.2.6-macOS.zip` / `Calculator-2.0-macOS.zip` / `Calculator-1.0-macOS.zip`）
+1. 打开本仓库的 [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) 页面，下载对应版本的安装包（当前推荐 `Calculator-3.3.5-macOS.zip`，历史版本 `Calculator-3.3.3-macOS.zip` / `Calculator-3.2.6-macOS.zip` / `Calculator-2.0-macOS.zip` / `Calculator-1.0-macOS.zip`）
 2. 双击解压得到「计算器.app」，拖入「应用程序」文件夹
 3. **首次启动会被 Gatekeeper 拦截**：安装包为开发者签名、未经 Apple 公证，系统会提示「无法验证开发者」或「Apple 无法检查其是否包含恶意软件」。按以下任一方式放行即可：
    - 在「访达」中 **按住 Control 点击（或右键）**「计算器.app」→ 选择「打开」→ 在弹窗中再次点击「打开」
@@ -551,7 +553,8 @@ Plotting used to be "type points, draw a line". In 3.x it is a small data-reduct
 
 | Version | Wheel items | Key differences |
 | --- | --- | --- |
-| **3.3.4** (current version) | 13 | Update alert no longer buried: the "You're Up to Date" alert had no explicit window level, so it sat at the default `.modalPanel` (8), below the corner panel `.statusBar` (25) and the Settings window `statusBar + 2` (27); the modal session then swallowed clicks in the covered area, leaving OK unclickable and the app apparently frozen. A shared `presentAlert(_:)` helper now lowers every own window at or above `.floating` to `.normal`, raises the alert to `statusBar + 3` (28), activates the app, and restores the original levels afterwards — applied to all four alerts (up-to-date, new version, signing-team mismatch, generic error) |
+| **3.3.5** (current version) | 13 | Unified motion (this release is entirely about expand / collapse feel): ① **Other modes expand without stutter** — expansion used to resize the window frame on every display tick, re-laying out the whole SwiftUI tree and competing with the wheel / page content transition; the size is now applied once and only position plus content transition animate, with the window move and the content transition sharing the same 0.38s duration and end point; ② **Pomodoro collapse now slides back to the bottom-left corner** — instead of shrinking in place it slides out to its hidden frame over 0.24s, matching the collapse rhythm and easing of every other mode; ③ **Pomodoro expand keeps its in-place expand with a content-layer scale fade-in**, now the reference implementation for the rest of the app |
+| 3.3.4 | 13 | Update alert no longer buried: the "You're Up to Date" alert had no explicit window level, so it sat at the default `.modalPanel` (8), below the corner panel `.statusBar` (25) and the Settings window `statusBar + 2` (27); the modal session then swallowed clicks in the covered area, leaving OK unclickable and the app apparently frozen. A shared `presentAlert(_:)` helper now lowers every own window at or above `.floating` to `.normal`, raises the alert to `statusBar + 3` (28), activates the app, and restores the original levels afterwards — applied to all four alerts (up-to-date, new version, signing-team mismatch, generic error) |
 | 3.3.3 | 13 | Position-memory fix: (1) **the right half of the screen was never remembered** — the native `performDrag` returns early while the panel is inactive or the app is in the background, so `frame.origin` read at mouse-up was still the pre-drag value and every save lagged one drag behind; it now waits for the button to be released and the window to settle before writing the final frame; (2) **relaxed clamping** — the old rule demanded the whole window be visible, which on a 1280pt display capped a 700pt matrix window at x=572 (dead centre) and snapped it back on reopen; now only 160pt of horizontal visibility plus a grabbable title bar is required, with the top edge kept below the menu bar, so wide windows stay where you drop them on the right half |
 | 3.3.2 | 13 | (1) **Settings panel rebuilt a third time** — `.sheet` was dropped (it kept re-presenting and could not be dismissed) in favour of a singleton window with a system title bar, closed with Esc, summoned with ⌘, and re-bound before the menu opens so only one window ever exists; (2) **Settings window on top** — its level was raised to `statusBar + 2` so the calculator panel can no longer cover it (the level code had been written into a resident invisible window and overwritten by a later `.normal`); (3) **system appearance applies immediately** — choosing "Follow System" now syncs `NSApp.appearance` and each window's appearance explicitly, so picking dark by day and switching back turns light again at once; (4) **new return-to-wheel animation** — the panel folds into its own centre and fades, then the wheel expands from the screen centre, with no more "slide back to the middle" transition |
 | 3.3.1 | 13 | A feel-and-polish patch for 3.3.0, all about window motion: (1) **native window dragging** — the previous `DragGesture` implementation accumulated drift in the macOS window coordinate space (the window lagged further behind the longer you dragged), now replaced by an `NSViewRepresentable` drag area calling `NSWindow.performDrag(with:)` directly; (2) **no more stutter when returning to the wheel** — the panel is now moved by an `NSView.displayLink` frame callback aligned to the display refresh (the old 60 Hz `Timer` was out of step with 120 Hz screens, so frame intervals jittered), and the glide back to the wheel changes position only instead of resizing the window every frame, paired with a pure opacity fade so the slide and the shrink land on the same frames; (3) the Pomodoro window drags natively too and remembers its position |
@@ -561,7 +564,7 @@ Plotting used to be "type points, draw a line". In 3.x it is a small data-reduct
 | 2.0 | 12 | Adds the "Pomodoro" mode on top of everything in 1.0: its own window, a remaining-time pill in the bottom-left corner, and end-of-phase alerts |
 | 1.0 | 11 | Basic / Scientific / Exchange / Weight / Temperature / Area / Speed / Time / Data / Base / Plot |
 
-> Note: **3.3.4 is published.** The newest installer on the [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page is **3.3.4** (asset name `Calculator-3.3.4-macOS.zip`), alongside **3.2.6**, **2.0** and **1.0**. The in-app "Check for Updates" only downloads zip assets whose name contains `macOS`. Every version is dependency-free and builds only on system frameworks (SwiftUI / AppKit / ServiceManagement / QuartzCore / Compression).
+> Note: **3.3.5 is published.** The newest installer on the [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page is **3.3.5** (asset name `Calculator-3.3.5-macOS.zip`), alongside **3.2.6**, **2.0** and **1.0**. The in-app "Check for Updates" only downloads zip assets whose name contains `macOS`. Every version is dependency-free and builds only on system frameworks (SwiftUI / AppKit / ServiceManagement / QuartzCore / Compression).
 
 ### Features
 
@@ -602,13 +605,14 @@ Plotting used to be "type points, draw a line". In 3.x it is a small data-reduct
 
 | Version | Installer | Size | Direct link |
 | --- | --- | --- | --- |
-| **3.3.4** (recommended) | `Calculator-3.3.4-macOS.zip` | ~3.7 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.3.4/Calculator-3.3.4-macOS.zip) |
+| **3.3.5** (recommended) | `Calculator-3.3.5-macOS.zip` | ~3.7 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.3.5/Calculator-3.3.5-macOS.zip) |
+| 3.3.4 | `Calculator-3.3.4-macOS.zip` | ~3.7 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.3.4/Calculator-3.3.4-macOS.zip) |
 | 3.3.3 | `Calculator-3.3.3-macOS.zip` | ~3.7 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.3.3/Calculator-3.3.3-macOS.zip) |
 | 3.2.6 | `Calculator-3.2.6-macOS.zip` | ~3.6 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v3.2.6/Calculator-3.2.6-macOS.zip) |
 | 2.0 | `Calculator-2.0-macOS.zip` | ~2.0 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v2.0/Calculator-2.0-macOS.zip) |
 | 1.0 | `Calculator-1.0-macOS.zip` | ~1.9 MB | [Download](https://github.com/f8r4ksv7v4-hub/Calculator/releases/download/v1.0/Calculator-1.0-macOS.zip) |
 
-> 3.3.4 is the current release (update-alert layering fix, window position memory, rebuilt Settings panel, system appearance support).
+> 3.3.5 is the current release (stutter-free expansion animation, unified Pomodoro collapse).
 
 All versions and release notes live on the [Releases](https://github.com/f8r4ksv7v4-hub/Calculator/releases) page.
 
